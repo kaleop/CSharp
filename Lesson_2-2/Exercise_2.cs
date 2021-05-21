@@ -31,7 +31,7 @@ namespace Lesson_2_2
                 {
                     Console.WriteLine("Не верное значение");
                 }
-            } while (i<1 || i>12);
+            } while (i<1 && i>12);
 
             Console.WriteLine($"Сейчас {(Months)i}");
 
