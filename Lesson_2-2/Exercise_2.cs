@@ -3,7 +3,8 @@
 namespace Lesson_2_2
 {
     class Exercise_2
-    {        enum Months
+    {        
+        enum Months
         {
             Январь = 1,
             Февраль = 2, 
@@ -17,7 +18,6 @@ namespace Lesson_2_2
             Октябрь = 10,
             Ноябрь = 11,
             Декабрь = 12
-
         }
 
         static void Main(string[] args)
