@@ -11,9 +11,6 @@ namespace Lesson_3_1
 
             Random r = new Random();
 
-            Console.WriteLine(mass.GetUpperBound(0));
-            Console.WriteLine(mass.GetUpperBound(1));
-
             for (int i = 0; i <= mass.GetUpperBound(0); i++)
             {
                 for (int j = 0; j <= mass.GetUpperBound(1); j++)
