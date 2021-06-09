@@ -27,22 +27,14 @@ namespace Lesson_7
         }
 
 
-        public void Move((int x, int y) position, ref Field f)
+        public void Move((int x, int y) position, ref Field gameField)
         {
-            Random r = new Random();
-            if (aiPlayer)
-            {
-                f.WriteSymbol(r.Next(0, f.FieldSize - 1), r.Next(0, f.FieldSize - 1), Symbol);
-            }
-            else
-            {
-                f.WriteSymbol(position.x, position.y, Symbol);
-            }
+            gameField.WriteSymbol(position.x, position.y, Symbol);
         }
 
-        public void AIMove()
+        public void AIMove(ref Field gameField)
         {
-
+            
         }
     }
 }

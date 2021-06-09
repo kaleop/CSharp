@@ -39,7 +39,7 @@ namespace Lesson_7
         }
 
         private int winRange = 3;
-        public int WinRage
+        public int WinRange
         {
             get 
             {
