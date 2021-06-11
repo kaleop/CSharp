@@ -12,18 +12,20 @@ namespace Lesson_7
         public char Symbol { get; private set; }
         private bool aiPlayer = false;
         private ArtificialIntelligence ai;
+        private Field playField;
 
 
-        public Player (string name, char symbol)
+        public Player (string name, char symbol, ref Field playField)
         {
             Name = name;
             Symbol = symbol;
+            this.playField = playField;
         }
 
-        public Player (char symbol) : this ("AI",symbol)
+        public Player (char symbol, ref Field playField) : this ("AI",symbol, ref playField)
         {
             aiPlayer = true;
-            ai = new ArtificialIntelligence();
+            ai = new ArtificialIntelligence( ref playField);
         }
 
 
@@ -32,9 +34,17 @@ namespace Lesson_7
             gameField.WriteSymbol(position.x, position.y, Symbol);
         }
 
-        public void AIMove(ref Field gameField)
+        public void AIMove()
         {
-            
+            Random r = new Random();
+            try
+            {
+                playField.WriteSymbol(r.Next(1, 7), r.Next(1, 7), Symbol);
+            }
+            catch (GameException ex) when (ex.Mark == ExceptionTeg.ErrorCellIsClosed)
+            {
+                AIMove();
+            }
         }
     }
 }

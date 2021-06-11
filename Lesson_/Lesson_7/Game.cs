@@ -8,7 +8,8 @@ namespace Lesson_7
 {
     enum Status
     {
-        Win,
+        WinPlayer,
+        WinAI,
         DrawGame,
         Nothing
     }
@@ -16,10 +17,13 @@ namespace Lesson_7
     {
         private string outOfRange = "Введённое значение не входит в заданный диапазон";
         private string errorValue = "Введено не корректное значение!";
+        private string cellisClossed = "Ячейка занята";
 
         private string userWinString;
         private string aiWinString;
         private Status gameStatus;
+
+        private List<string> allLine;
 
         private (int x, int y) step;
         public Player User { get; private set; }
@@ -39,16 +43,17 @@ namespace Lesson_7
 
         public Game()
         {            
-            User = new Player(Environment.UserName, 'X');
-            AI = new Player('O');
             gameStatus = Status.Nothing;
-            userWinString = new string('X', PlayingField.WinRange);
-            aiWinString = new string('O', PlayingField.WinRange);
+            allLine = new List<string>();
         }
 
         public  void Start()
         {
             GetArraySize();
+            User = new Player(Environment.UserName, 'X', ref playingField);
+            AI = new Player('O', ref  playingField);
+            userWinString = new string('X', PlayingField.WinRange);
+            aiWinString = new string('O', PlayingField.WinRange);
             Console.WriteLine();
             GetWinRange();
             Show();
@@ -56,11 +61,30 @@ namespace Lesson_7
 
         public void Play()
         {
+            Status s = new Status();
             GetPosition();
+            Console.Clear();
             User.Move(step, ref playingField);
-            Show();
+            s = Scan();
             AI.AIMove();
+            s = Scan();
             Show();
+
+            switch (s)
+            {
+                case Status.WinPlayer:
+                    Warning($"{User.Name} Победил", ConsoleColor.Green);
+                    break;
+                case Status.WinAI:
+                    Warning($"{AI.Name} победил");
+                    break;
+                case Status.DrawGame:
+                    Warning("Ничья", ConsoleColor.Yellow);
+                    break;
+                case Status.Nothing:
+                    Play();
+                    break;
+            }
 
         }
 
@@ -89,9 +113,16 @@ namespace Lesson_7
             }
         }
 
-        private void Warning (string s)
+        public void Warning (string s)
         {
             Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n{s}\n");
+            Console.ResetColor();
+        }
+
+        public void Warning(string s, ConsoleColor cs)
+        {
+            Console.ForegroundColor = cs;
             Console.WriteLine($"\n{s}\n");
             Console.ResetColor();
         }
@@ -137,6 +168,7 @@ namespace Lesson_7
                 }
                 else
                 {
+                    Warning(cellisClossed);
                     GetPosition();
                 }
             }
@@ -167,45 +199,81 @@ namespace Lesson_7
             return PlayingField.GameField[y-1, x-1] == '-';
         }
 
-        private void Scan()
+        private Status Scan()
         {
+            GetAllLine();
+            foreach (string s in allLine)
+            {
+                if (s.Contains( new string('X', PlayingField.WinRange)))
+                {
+                    return Status.WinPlayer;
+                }
+                if (s.Contains(new string('O', PlayingField.WinRange)))
+                {
+                    return Status.WinAI;
+                }
+            }
 
+            int allClosed = 0;
+            foreach (char c in PlayingField.GameField)
+            {
+                if (c != '-')
+                {
+                    allClosed++;
+                }
+                else return Status.Nothing;
+            }
+            if (allClosed == PlayingField.FieldSize*PlayingField.FieldSize )
+            {
+                return Status.DrawGame;
+            }
+            return Status.Nothing;
         }
 
-        private List<string> GetLines()
+        private List<string> GetHorizontLine()
         {
             StringBuilder sbHorizont = new StringBuilder();
-            StringBuilder sbVertical = new StringBuilder();
 
             List<string> line = new List<string>();
-            
+
             for (int i = 0; i < PlayingField.FieldSize; i++)
             {
                 for (int j = 0; j < PlayingField.FieldSize; j++)
                 {
                     sbHorizont.Append(PlayingField.GameField[i, j]);
-                    if (j+1 == PlayingField.FieldSize)
+                    if (j + 1 == PlayingField.FieldSize)
                     {
                         line.Add(sbHorizont.ToString());
                         sbHorizont.Clear();
                     }
                 }
-
-                for (int z = 0; z < PlayingField.FieldSize; z++)
-                {
-                    sbVertical.Append(PlayingField.GameField[z, i]);
-                    if (z + 1 == PlayingField.FieldSize)
-                    {
-                        line.Add(sbVertical.ToString());
-                        sbHorizont.Clear();
-                    }
-
-                }   
             }
             return line;
         }
 
-        private void GetDiagonals()
+        private List<string> GetVerticalLine ()
+        {
+            StringBuilder sbVertical = new StringBuilder();
+
+            List<string> line = new List<string>();
+
+            for (int i = 0; i < PlayingField.FieldSize; i++)
+            {
+                for (int j = 0; j < PlayingField.FieldSize; j++)
+                {
+                    sbVertical.Append(PlayingField.GameField[j, i]);
+                    if (j + 1 == PlayingField.FieldSize)
+                    {
+                        line.Add(sbVertical.ToString());
+                        sbVertical.Clear();
+                    }
+
+                }
+            }
+            return line;
+        }
+
+        private List<string> GetDiagonals()
         {
             List<string> line = new List<string>();
             StringBuilder sbDiag = new StringBuilder();
@@ -221,6 +289,7 @@ namespace Lesson_7
                         line.Add(sbDiag.ToString());
                         counter++;
                         sbDiag.Clear();
+                        break;
                     }
                 }
             }
@@ -232,12 +301,13 @@ namespace Lesson_7
             {
                 for (int i = counter; i < PlayingField.FieldSize; i++)
                 {
-                    sbDiag.Append(PlayingField.GameField[i,i-counter]);
+                    sbDiag.Append(PlayingField.GameField[i, i - counter]);
                     if (i == PlayingField.FieldSize - 1)
                     {
                         line.Add(sbDiag.ToString());
                         counter++;
                         sbDiag.Clear();
+                        break;
                     }
                 }
             }
@@ -254,6 +324,7 @@ namespace Lesson_7
                         line.Add(sbDiag.ToString());
                         counter++;
                         sbDiag.Clear();
+                        break;
                     }
                 }
             }
@@ -270,10 +341,28 @@ namespace Lesson_7
                         line.Add(sbDiag.ToString());
                         counter++;
                         sbDiag.Clear();
+                        break;
                     }
                 }
             }
             while (counter < PlayingField.WinRange-1);
+
+            return line;
+        }
+
+        private void GetAllLine ()
+        {
+            allLine.AddRange(GetHorizontLine());
+            allLine.AddRange(GetVerticalLine());
+            allLine.AddRange(GetDiagonals());
+        }
+
+        private void ShowLines()
+        {
+            foreach(string s in allLine)
+            {
+                Console.WriteLine(s);
+            }
         }
     }
 }

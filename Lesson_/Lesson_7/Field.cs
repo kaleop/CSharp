@@ -93,7 +93,14 @@ namespace Lesson_7
 
         public void WriteSymbol(int x, int y, char c)
         {
-            field[y-1, x-1] = c;
+            if (GameField[y-1,x-1] != '-')
+            {
+                throw new GameException(ExceptionTeg.ErrorCellIsClosed);
+            }
+            else
+            {
+                field[y - 1, x - 1] = c;
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Lesson_7
         ErrorArrayLength,
         ErrorWinRangeLength,
         ErrorOutOfRange,
+        ErrorCellIsClosed
     }
 
     [Serializable]
